@@ -1,0 +1,76 @@
+package BussinessLogical;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import dbUtils.DbHelper;
+import dbUtils.IConnectionProvider;
+import dbUtils.JdbcProvider;
+
+public class Cart {
+	private IConnectionProvider connectionProvider = null;
+    private String sourceName = "shop";
+    private DbHelper dbHelper;
+    public Cart(){
+		try {
+	        connectionProvider = new JdbcProvider(
+	                "com.mysql.jdbc.Driver",
+	                "jdbc:mysql://127.0.0.1:3306/",
+	                "root","12345");
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+		dbHelper = new DbHelper(connectionProvider, sourceName);
+    }
+    
+    public int add(JavaBean.Cart item) throws SQLException {
+		return dbHelper.insertAndReturnKey(
+				"INSERT INTO Cart(ProductId,ProductName, Price, Quantity,Picture) VALUES(?,?,?,?,?)",
+				item.getProductId(),
+				item.getProductName(),
+				item.getPrice(),
+				item.getQuantity(),
+				item.getPicture());
+	}
+    
+	public JavaBean.Cart findById(int id) throws Exception{
+		String sql = "SELECT * FROM Product WHERE ProductId=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){
+			JavaBean.Cart item = new JavaBean.Cart();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(rs.getString(6));
+			item.setQuantity("1");
+			item.setPicture(rs.getString(9));
+			return item;
+		}
+		else
+			return null;
+	}
+    
+	public List<JavaBean.Cart> findAll() throws Exception{
+		String sql = "SELECT * FROM Cart";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Cart> items = new ArrayList<JavaBean.Cart>();
+		while (rs.next()){
+			JavaBean.Cart item = new JavaBean.Cart();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(rs.getString(3));
+			item.setQuantity(rs.getString(4));
+			item.setPicture(rs.getString(5));
+			items.add(item);
+		}
+		
+		return items;
+	}
+	
+	public void remove(int id) throws Exception{
+		String sql = "DELETE FROM Cart WHERE ProductId=?";
+		dbHelper.updatePrepareSQL(sql, id);
+	}
+	
+}

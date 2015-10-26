@@ -1,0 +1,43 @@
+
+* {
+    box-sizing: border-box;
+}
+html, body {
+    font-family:ËÎÌו,'Times New Roman';
+    font-size: 100%;
+    background: #fff;
+}
+h4, h5, h6,
+h1, h2, h3 {margin-top: 0;}
+ul, ol {margin: 0;}
+p {margin: 0;}
+
+.header_top {
+    background:#740ce7;
+   height:30px
+}
+.container{
+	width:90%;
+	
+}
+.header-top-left{
+	width:54.5%;
+	float:left;
+	margin-top:0px;
+}
+.box{
+	float:left;
+	width:20.5%;
+	margin-right:10.6%;
+}
+.box1{
+	float:left;
+	width:20.5%;
+}
+.dropdown{
+	display:block;
+	font-size:11px;
+	overflow:hidden;
+	white-space:nowrap;
+	font-weight:400;
+	}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+	<script type="application/x-javascript"> 
+		addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); 
+		function hideURLbar(){ window.scrollTo(0,1); }
+	</script>
+	<!-- css -->
+	<link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
+	<link href="css/newStyle.css" rel='stylesheet' type='text/css' />
+	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+	<!-- dropdown -->
+	<script src="js/jquery.easydropdown.js"></script>
+	<!-- start menu -->
+	<link href="css/megamenu.css" rel="stylesheet" type="text/css" media="all" />
+	<script type="text/javascript" src="js/megamenu.js"></script>
+	<script>$(document).ready(function(){$(".megamenu").megamenu();});</script>
+</head>
+<body>
+	<div class="header_top">
+		<div class="container">
+		  	<div class="header_top-box">
+		     <div class="header-top-left">
+					  <div class="box" align="left">
+					  	   	<select tabindex="4" class="dropdown">
+							   <option value="" class="label" value="">使用的货币</option>
+						       <option value="1">人民币</option>
+						       <option value="2">美元</option>
+							</select>
+		   			   </div>
+		   			   <div class="box1">
+		   				       <select tabindex="4" class="dropdown">
+									<option value="" class="label" value="">语言</option>
+									<option value="1">English</option>
+									<option value="2">中文</option>
+									
+							  </select>
+		   			   </div>
+		   				    <div class="clearfix"></div>
+		   			 </div>
+					 <div class="cssmenu">
+						<ul>
+							<li class="active"><a href="Login.html">账户</a></li> 
+							<li><a href="wishlist.html">Wishlist</a></li>
+							<li><a href="login.html">Log In</a></li> 
+							<li><a href="register.html">Sign Up</a></li>
+						</ul>
+					</div>
+					<div class="clearfix"></div>
+		    </div>
+  </div>
+	</div>
+	<div class="header_bottom"></div>
+	<div class="menu"></div>
+	<div class="book">
+		<div class="container">
+			<div class="register"></div>
+		</div>	
+	</div>
+	<div class="footer"></div>
+</body>
+</html>

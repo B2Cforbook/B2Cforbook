@@ -1,0 +1,158 @@
+package Servlet;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import BussinessLogical.Manager;
+
+/**
+ * Servlet implementation class ManagerServlet
+ */
+@WebServlet("/Manager")
+public class ManagerServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ManagerServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		doPost(req, res);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		
+		String isLogin = (String)req.getSession().getAttribute("ISLOGIN");
+		String action = req.getParameter("action");
+
+		if (action != null && action.equals("list")){
+			req.setAttribute("Managers", this.list());
+			req.getRequestDispatcher("/managerList.jsp").forward(req, res);
+			return;
+		}
+		
+		//
+		if (action != null && action.equals("login")){
+			String loginName = req.getParameter("loginName");
+			String password  = req.getParameter("password");
+			if (loginName != null && password != null){
+				if (!loginName.equals("") && !password.equals("")){
+					try {
+						if (login(loginName, password)){
+							req.getSession().setAttribute("ISLOGIN", "1");
+							res.sendRedirect("productList.jsp");
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		
+		if (action != null && action.equals("exit")){
+			req.getSession().invalidate();
+			res.sendRedirect("mlogin.jsp");
+		}
+		
+		if (action != null && action.equals("edit")){
+			try {
+				
+				int id = Integer.parseInt(req.getParameter("ManagerId"));
+				req.setAttribute("Manager", new Manager().findById(id));
+				req.getRequestDispatcher("/managerEdit.jsp").forward(req, res);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("del")){
+			try {
+				int id = Integer.parseInt(req.getParameter("UserId"));
+				new Manager().remove(id);
+				res.sendRedirect("Manager?action=list");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (action != null && action.equals("save")){
+			JavaBean.Manager item = this.getManager(req);
+			if (item != null){
+				BussinessLogical.Manager svc = new BussinessLogical.Manager();
+				try {
+					svc.save(item);
+					res.sendRedirect("Manager?action=list");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private Boolean login(String loginName, String password) throws Exception {
+		Manager svc = new Manager();
+		return svc.login(loginName, password);
+	}
+	
+	private void Register(JavaBean.Manager item) throws Exception{
+		BussinessLogical.Manager svc = new BussinessLogical.Manager();
+		if (!svc.isExist(item.getLoginName())){
+			svc.add(item);
+		}
+		else {
+			throw new Exception("Manager Exist.");
+		}
+	}
+	
+	private List<JavaBean.Manager> list(){
+    	Manager svc = new Manager();
+		try {
+			return svc.findAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+    }
+	
+	private JavaBean.Manager getManager(HttpServletRequest req){
+		String loginName = req.getParameter("loginName");
+		if (loginName == null || loginName.equals(""))
+			return null;
+		String password  = req.getParameter("password");
+		if (password == null || password.equals(""))
+			return null;
+		
+		JavaBean.Manager item = new JavaBean.Manager();
+		String id = req.getParameter("ManagerId");
+		if (id != null && !id.equals(""))
+			item.setId(Integer.parseInt(id));
+		
+		item.setLoginName(loginName);
+		item.setPassword(password);
+		
+		return item;
+    }
+}	
+	

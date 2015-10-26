@@ -1,0 +1,76 @@
+package BussinessLogical;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import dbUtils.DbHelper;
+import dbUtils.IConnectionProvider;
+import dbUtils.JdbcProvider;
+
+public class Comment {
+	private IConnectionProvider connectionProvider = null;
+    private String sourceName = "shop";
+    private DbHelper dbHelper;
+    public Comment(){
+		try {
+	        connectionProvider = new JdbcProvider(
+	                "com.mysql.jdbc.Driver",
+	                "jdbc:mysql://127.0.0.1:3306/",
+	                "root","12345");
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+		dbHelper = new DbHelper(connectionProvider, sourceName);
+    }
+    
+    public int add(JavaBean.Comment item) throws SQLException {
+		return dbHelper.insertAndReturnKey(
+				"INSERT INTO Review(ProductId,userName,Quality,Price,Comment) VALUES(?,?,?,?,?)",
+				item.getProductId(),
+				item.getUserName(),
+				item.getQuality(),
+				item.getPrice(),
+				item.getComment());
+	}
+    
+	public JavaBean.Comment findById(int id) throws Exception{
+		String sql = "SELECT * FROM Review WHERE ProductId=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){
+			JavaBean.Comment item = new JavaBean.Comment();
+			item.setProductId(rs.getInt(1));
+			item.setComment(rs.getString(2));
+			item.setQuality(rs.getString(3));
+			item.setPrice(rs.getString(4));
+			item.setUserName(rs.getString(5));
+			return item;
+		}
+		else
+			return null;
+	}
+    
+	public List<JavaBean.Comment> findAll(int id) throws Exception{
+		String sql = "SELECT * FROM Review WHERE ProductId=?";
+		ResultSet rs = dbHelper.query(sql,id);
+		List<JavaBean.Comment> items = new ArrayList<JavaBean.Comment>();
+		while (rs.next()){
+			JavaBean.Comment item = new JavaBean.Comment();
+			item.setProductId(rs.getInt(1));
+			item.setComment(rs.getString(2));
+			item.setQuality(rs.getString(3));
+			item.setPrice(rs.getString(4));
+			
+			
+			items.add(item);
+		}
+		
+		return items;
+	}
+	
+	public void remove(int id) throws Exception{
+		String sql = "DELETE FROM Review WHERE ProductId=?";
+		dbHelper.updatePrepareSQL(sql, id);
+	}
+	
+}

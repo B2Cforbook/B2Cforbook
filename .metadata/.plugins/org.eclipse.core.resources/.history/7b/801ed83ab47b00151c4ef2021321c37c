@@ -1,0 +1,93 @@
+package Servlet;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import BussinessLogical.Comment;
+import BussinessLogical.Product;
+
+/**
+ * Servlet implementation class CommentServlet
+ */
+@WebServlet("/Comment")
+public class CommentServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public CommentServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    private JavaBean.Product show(int id){
+    	Product svc = new Product();
+		try {
+			return svc.findById(id);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+    }
+    
+    private List<JavaBean.Comment> list(int id){
+    	Comment svc = new Comment();
+		try {
+			return svc.findAll(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doPost(request,response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		req.setCharacterEncoding("UTF-8");
+		String action = req.getParameter("action");
+		
+		try{
+			if (action != null && action.equals("review")){
+				JavaBean.Comment item=new JavaBean.Comment();
+				int id = Integer.parseInt(req.getParameter("id"));
+				String comment=req.getParameter("detail");
+				String quality=req.getParameter("quality");
+				String price=req.getParameter("price");
+				String userName=req.getParameter("nickname");
+				item.setProductId(id);
+				item.setComment(comment);
+				item.setPrice(price);
+				item.setQuality(quality);
+				item.setUserName(userName);
+				new Comment().add(item);
+				req.setAttribute("product",this.show(id));
+
+				req.setAttribute("Items", this.list(id));
+				req.getRequestDispatcher("product_page.jsp").forward(req, res);
+			}
+		}catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		}
+		
+	}
+

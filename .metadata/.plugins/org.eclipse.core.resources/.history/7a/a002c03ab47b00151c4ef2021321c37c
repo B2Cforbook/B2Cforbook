@@ -1,0 +1,132 @@
+package Servlet;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.*;
+import java.util.*;
+
+import BussinessLogical.Cart;
+import BussinessLogical.Product;
+import BussinessLogical.Order;
+
+/**
+ * Servlet implementation class ShoppingCart
+ */
+@WebServlet("/Cart")
+public class CartServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public CartServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doPost(req,res);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		req.setCharacterEncoding("UTF-8");
+		String action=req.getParameter("action");
+		
+		if (action != null && action.equals("add")){
+			JavaBean.Cart item;
+			try {
+				item = this.getProduct(req);
+				if (item != null){
+					String quantity=req.getParameter("quantity");
+					item.setQuantity(quantity);
+				
+					new Cart().add(item);
+					req.getRequestDispatcher("index.jsp").forward(req, res);
+					
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("list")){
+			req.setAttribute("Products", this.list());
+			req.getRequestDispatcher("shopping_cart.jsp").forward(req, res);
+		}
+		
+		if (action != null && action.equals("del")){
+			int id = Integer.parseInt(req.getParameter("productId"));
+			this.remove(id);
+			req.getRequestDispatcher("Cart?action=list").forward(req, res);
+		}
+		
+		if (action != null && action.equals("pay")){
+			try {
+				int id = Integer.parseInt(req.getParameter("id"));
+				JavaBean.Order item=new Order().findById(id);
+				JavaBean.Product product=new Product().findById(id);
+				req.setAttribute("product",item);
+				req.setAttribute("item", product);
+				req.getRequestDispatcher("check_out.jsp").forward(req, res);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	private JavaBean.Cart getProduct(HttpServletRequest req) throws Exception{
+    	int pId = Integer.parseInt(req.getParameter("id"));
+
+    	
+    	JavaBean.Cart item = new JavaBean.Cart();
+    	Cart svc=new Cart();
+    	item=svc.findById(pId);
+
+    	return item;
+    }
+    
+	private void remove(int id){
+		Cart svc = new Cart();
+		try {
+			svc.remove(id);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+    private List<JavaBean.Cart> list(){
+    	Cart svc = new Cart();
+		try {
+			return svc.findAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+    
+	private double pay(int id) throws Exception{
+		JavaBean.Cart item;
+		item=new Cart().findById(id);
+		double quantity=Double.parseDouble(item.getQuantity());
+		double price=Double.parseDouble(item.getPrice());
+		double amount=quantity*price;
+		return amount;
+	}
+
+}

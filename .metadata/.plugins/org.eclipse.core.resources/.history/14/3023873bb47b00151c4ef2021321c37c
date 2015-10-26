@@ -1,0 +1,144 @@
+package BussinessLogical;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import dbUtils.DbHelper;
+import dbUtils.IConnectionProvider;
+import dbUtils.JdbcProvider;
+
+public class Order {
+	private IConnectionProvider connectionProvider = null;
+    private String sourceName = "shop";
+    private DbHelper dbHelper;
+    public Order(){
+		try {
+	        connectionProvider = new JdbcProvider(
+	                "com.mysql.jdbc.Driver",
+	                "jdbc:mysql://127.0.0.1:3306/",
+	                "root","root");
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+		dbHelper = new DbHelper(connectionProvider, sourceName);
+    }
+    
+    public int add(JavaBean.Order item) throws SQLException {
+		return dbHelper.insertAndReturnKey(
+				"INSERT INTO orderss(ProductId,ProductName, Price, Quantity,Amount,Address,UserName,Telephone,Payway,LogisticStatement) VALUES(?,?,?,?,?,?,?,?,?,?)",
+				item.getProductId(),
+				item.getProductName(),
+				item.getPrice(),
+				item.getQuantity(),
+				item.getAmount(),
+				item.getAddress(),
+				item.getUserName(),
+				item.getTelephone(),
+				item.getPayway(),
+				item.getLogisticStatement());
+	}
+    
+	public JavaBean.Order findById(int id) throws Exception{
+		String sql = "SELECT * FROM Cart WHERE ProductId=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){	
+			JavaBean.Order item = new JavaBean.Order();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(Double.parseDouble(rs.getString(3)));
+			item.setQuantity(Double.parseDouble(rs.getString(4)));
+			item.setAmount(Double.parseDouble(rs.getString(3))*Double.parseDouble(rs.getString(4)));
+			return item;
+		}
+		else
+			return null;
+	}
+    
+	public JavaBean.Order findByName(String name) throws Exception{
+		String sql = "SELECT * FROM orderss WHERE UserName=?";
+		ResultSet rs = dbHelper.findById(sql, name);
+		if (rs.next()){	
+			JavaBean.Order item = new JavaBean.Order();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(rs.getDouble(3));
+			item.setQuantity(rs.getDouble(4));
+			item.setAmount(rs.getDouble(5));
+			item.setAddress(rs.getString(6));
+			item.setUserName(rs.getString(7));
+			item.setTelephone(rs.getString(8));
+			item.setPayway(rs.getString(9));
+			item.setLogisticStatement(rs.getString(10));
+			return item;
+		}
+		else
+			return null;
+	}
+	
+	public JavaBean.Order findByproductid(int id) throws Exception{
+		String sql = "SELECT * FROM orderss WHERE ProductId=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){	
+			JavaBean.Order item = new JavaBean.Order();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(rs.getDouble(3));
+			item.setQuantity(rs.getDouble(4));
+			item.setAmount(rs.getDouble(5));
+			item.setAddress(rs.getString(6));
+			item.setUserName(rs.getString(7));
+			item.setTelephone(rs.getString(8));
+			item.setPayway(rs.getString(9));
+			item.setLogisticStatement(rs.getString(10));
+			return item;
+		}
+		else
+			return null;
+	}
+	
+	
+	public List<JavaBean.Order> findAll() throws Exception{
+		String sql = "SELECT * FROM orderss";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Order> items = new ArrayList<JavaBean.Order>();
+		while (rs.next()){
+			JavaBean.Order item = new JavaBean.Order();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setPrice(rs.getDouble(3));
+			item.setQuantity(rs.getDouble(4));
+			item.setAmount(rs.getDouble(5));
+			item.setAddress(rs.getString(6));
+			item.setUserName(rs.getString(7));
+			item.setTelephone(rs.getString(8));
+			item.setPayway(rs.getString(9));
+			item.setLogisticStatement(rs.getString(10));
+			items.add(item);
+		}
+		
+		return items;
+	}
+	
+	public void remove(int id) throws Exception{
+		String sql = "DELETE FROM orderss WHERE ProductId=?";
+		dbHelper.updatePrepareSQL(sql, id);
+	}
+	
+	public int save(JavaBean.Order item) throws SQLException {
+		return dbHelper.updatePrepareSQL(
+				"UPDATE orderss SET ProductName=?,Price=?, Quantity=?, Amount=?,Address=?,UserName=?,Telephone=?,Payway=?,LogisticStatement=? WHERE ProductId=?",
+				item.getProductName(),
+				item.getPrice(),
+				item.getQuantity(),
+				item.getAmount(),
+				item.getAddress(),
+				item.getUserName(),
+				item.getTelephone(),
+				item.getPayway(),
+				item.getLogisticStatement(),
+				item.getProductId());
+	}
+	
+}

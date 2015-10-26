@@ -1,0 +1,188 @@
+package Servlet;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import java.util.*;
+
+import BussinessLogical.Cart;
+import BussinessLogical.Product;
+
+
+/**
+ * Servlet implementation class Order
+ */
+@WebServlet("/Order")
+public class OrderServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public OrderServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+   
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doPost(req,res);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		req.setCharacterEncoding("UTF-8");
+		String action=req.getParameter("action");
+		if (action != null && action.equals("add")){
+			JavaBean.Order item;
+			try {
+				item = this.getProduct(req);
+				if (item != null){
+					new BussinessLogical.Order().add(item);
+					req.getRequestDispatcher("index.jsp").forward(req, res);
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("pay")){
+			try {
+				int id = Integer.parseInt(req.getParameter("id"));
+				JavaBean.Order item=new BussinessLogical.Order().findById(id);
+				if (item != null){
+					String address=req.getParameter("address");
+					String userName=req.getParameter("userName");
+					String payway=req.getParameter("payWay");
+					String telephone=req.getParameter("telephone");
+				
+					item.setAddress(address);
+					item.setPayway(payway);
+					item.setTelephone(telephone);
+					item.setUserName(userName);
+					item.setLogisticStatement("δ֪");
+					new BussinessLogical.Order().add(item);
+					req.getRequestDispatcher("index.jsp").forward(req, res);
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("check")){
+			try {
+				
+				String name=req.getParameter("name");
+				JavaBean.Order item=new BussinessLogical.Order().findByName(name);
+				if (item != null){
+					req.setAttribute("order",item);
+					req.getRequestDispatcher("logistic.jsp").forward(req, res);
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("list")){
+			req.setAttribute("Orders", this.list());
+			req.getRequestDispatcher("orderList.jsp").forward(req, res);
+		}
+		
+		if (action != null && action.equals("lists")){
+			req.setAttribute("Orders", this.list());
+			req.getRequestDispatcher("orderSearch.jsp").forward(req, res);
+		}
+		if (action != null && action.equals("edit")){
+			try {
+				int id = Integer.parseInt(req.getParameter("productId"));
+				req.setAttribute("order", new BussinessLogical.Order().findByproductid(id));
+				req.getRequestDispatcher("orderEdit.jsp").forward(req, res);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("del")){
+			try {
+				int id = Integer.parseInt(req.getParameter("productId"));
+				new BussinessLogical.Order().remove(id);
+				req.getRequestDispatcher("Order?action=list").forward(req, res);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (action != null && action.equals("save")){
+			this.save(this.getOrder(req));
+			req.getRequestDispatcher("Order?action=list").forward(req, res);
+		}
+		
+	}
+	 private List<JavaBean.Order> list(){
+	    	BussinessLogical.Order svc = new BussinessLogical.Order();
+			try {
+				return svc.findAll();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+	    }
+	    
+	    private JavaBean.Order getProduct(HttpServletRequest req) throws Exception{
+	    	int pId = Integer.parseInt(req.getParameter("id"));
+	    	JavaBean.Order item = new JavaBean.Order();
+	    	BussinessLogical.Order svc=new BussinessLogical.Order();
+	    	item=svc.findById(pId);
+	    	
+	    	return item;
+	    }
+	    
+		private void save(JavaBean.Order item){
+			try {
+				new BussinessLogical.Order().save(item);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	    private JavaBean.Order getOrder(HttpServletRequest req){
+	    	String pid = req.getParameter("productId");
+	    	String pName = req.getParameter("productName");
+	    	String userName = req.getParameter("userName");
+	    	String price = req.getParameter("price");
+	    	String quantity = req.getParameter("quantity");
+	    	String address = req.getParameter("address");
+	    	String telephone = req.getParameter("telephone");
+	    	String logistic = req.getParameter("logistic");
+	    	JavaBean.Order item = new JavaBean.Order();
+	    	item.setProductId(Integer.parseInt(pid));
+	    	item.setProductName(pName);
+	    	item.setUserName(userName);
+	    	item.setPrice(Double.parseDouble(price));
+	    	item.setQuantity(Double.parseDouble(quantity));
+	    	item.setAddress(address);
+	    	item.setTelephone(telephone);
+	    	item.setLogisticStatement(logistic);
+	    	
+	    	return item;
+	    }
+
+
+}

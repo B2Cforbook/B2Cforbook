@@ -1,0 +1,152 @@
+package BussinessLogical;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import dbUtils.DbHelper;
+import dbUtils.IConnectionProvider;
+import dbUtils.JdbcProvider;
+
+public class Product {
+	private IConnectionProvider connectionProvider = null;
+    private String sourceName = "shop";
+    private DbHelper dbHelper;
+    public Product(){
+		try {
+	        connectionProvider = new JdbcProvider(
+	                "com.mysql.jdbc.Driver",
+	                "jdbc:mysql://127.0.0.1:3306/",
+	                "root","12345");
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+		dbHelper = new DbHelper(connectionProvider, sourceName);
+    }
+    
+	public int add(JavaBean.Product item) throws SQLException {
+		return dbHelper.insertAndReturnKey(
+				"INSERT INTO Product(ProductName, Category, Categorys,OldPrice,Price, Memo,Stock,Picture,Discount) VALUES(?,?,?,?,?,?,?,?,?)",
+				item.getProductName(),
+				item.getCategory(),
+				item.getCategorys(),
+				item.getOldPrice(),
+				item.getPrice(),
+				item.getMemo(),
+				item.getStock(),
+				item.getPicture(),
+				item.getDiscount());
+	}
+	
+	public int save(JavaBean.Product item) throws SQLException {
+		return dbHelper.updatePrepareSQL(
+				"UPDATE Product SET ProductName=?, Category=?, Categorys=?,OldPrice=?,Price=?, Memo=?,Stock=? ,Picture=?,Discount=? WHERE ProductId=?",
+				item.getProductName(),
+				item.getCategory(),
+				item.getCategorys(),
+				item.getOldPrice(),
+				item.getPrice(),
+				item.getMemo(),
+				item.getStock(),
+				item.getPicture(),
+				item.getDiscount(),
+				item.getProductId());
+		
+		
+	}
+	
+	public JavaBean.Product findById(int id) throws Exception{
+		String sql = "SELECT * FROM Product WHERE ProductId=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){
+			JavaBean.Product item = new JavaBean.Product();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setCategory(rs.getString(3));
+			item.setCategorys(rs.getString(4));
+			item.setOldPrice(rs.getDouble(5));
+			item.setPrice(rs.getString(6));
+			item.setMemo(rs.getString(7));
+			item.setStock(rs.getString(8));
+			item.setPicture(rs.getString(9));
+			item.setDiscount(rs.getString(10));
+			return item;
+		}
+		else
+			return null;
+	}
+	
+	public List<JavaBean.Product> findAll() throws Exception{
+		String sql = "SELECT * FROM Product";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Product> items = new ArrayList<JavaBean.Product>();
+		while (rs.next()){
+			JavaBean.Product item = new JavaBean.Product();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setCategory(rs.getString(3));
+			item.setCategorys(rs.getString(4));
+			item.setOldPrice(rs.getDouble(5));
+			item.setPrice(rs.getString(6));
+			item.setMemo(rs.getString(7));
+			item.setStock(rs.getString(8));
+			item.setPicture(rs.getString(9));
+			item.setDiscount(rs.getString(10));
+			
+			items.add(item);
+		}
+		
+		return items;
+	}
+	
+	public List<JavaBean.Product> findByKey(String name) throws Exception{
+		String sql = "SELECT * FROM Product where productName like '%"+name+"%'";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Product> items = new ArrayList<JavaBean.Product>();
+		while (rs.next()){
+			JavaBean.Product item = new JavaBean.Product();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setCategory(rs.getString(3));
+			item.setCategorys(rs.getString(4));
+			item.setOldPrice(rs.getDouble(5));
+			item.setPrice(rs.getString(6));
+			item.setMemo(rs.getString(7));
+			item.setStock(rs.getString(8));
+			item.setPicture(rs.getString(9));
+			item.setDiscount(rs.getString(10));
+			
+			items.add(item);
+		}
+		
+		return items;
+	}
+	public List<JavaBean.Product> findBy(String name) throws Exception{
+		String sql = "SELECT * FROM Product where discount like '%"+name+"%'";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Product> items = new ArrayList<JavaBean.Product>();
+		while (rs.next()){
+			JavaBean.Product item = new JavaBean.Product();
+			item.setProductId(rs.getInt(1));
+			item.setProductName(rs.getString(2));
+			item.setCategory(rs.getString(3));
+			item.setCategorys(rs.getString(4));
+			item.setOldPrice(rs.getDouble(5));
+			item.setPrice(rs.getString(6));
+			item.setMemo(rs.getString(7));
+			item.setStock(rs.getString(8));
+			item.setPicture(rs.getString(9));
+			item.setDiscount(rs.getString(10));
+			
+			items.add(item);
+		}
+		
+		return items;
+	}
+	
+	public void remove(int id) throws Exception{
+		String sql = "DELETE FROM Product WHERE ProductId=?";
+		dbHelper.updatePrepareSQL(sql, id);
+	}
+}

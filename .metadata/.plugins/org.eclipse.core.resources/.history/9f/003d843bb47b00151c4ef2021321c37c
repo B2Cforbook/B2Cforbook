@@ -1,0 +1,90 @@
+package BussinessLogical;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import dbUtils.DbHelper;
+import dbUtils.IConnectionProvider;
+import dbUtils.JdbcProvider;
+
+public class Manager {
+	private IConnectionProvider connectionProvider = null;
+    private String sourceName = "shop";
+    private DbHelper dbHelper;
+    public Manager(){
+		try {
+	        connectionProvider = new JdbcProvider(
+	                "com.mysql.jdbc.Driver",
+	                "jdbc:mysql://127.0.0.1:3306/",
+	                "root","12345");
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+		dbHelper = new DbHelper(connectionProvider, sourceName);
+    }
+    
+	public int add(JavaBean.Manager item) throws SQLException {
+		return dbHelper.insertAndReturnKey(
+				"INSERT INTO Manager(LoginName, Password) VALUES(?,?)",
+				item.getLoginName(),
+				item.getPassword());
+	}
+	
+	public int save(JavaBean.Manager item) throws SQLException {
+		return dbHelper.updatePrepareSQL(
+				"UPDATE Manager SET LoginName=?, Password=? WHERE Id=?",
+				item.getLoginName(),
+				item.getPassword(),
+				item.getId());
+	}
+	public Boolean isExist(String loginName) throws Exception {
+		ResultSet rs = dbHelper.query("SELECT * FROM Manager WHERE LoginName = ?", loginName);
+		if (rs.next())
+			return true;
+		
+		return false;
+	}
+	public Boolean login(String loginName, String password) throws Exception {
+		ResultSet rs = dbHelper.query("SELECT * FROM Manager WHERE LoginName = ? AND Password = ?", loginName, password);
+		if (rs.next())
+			return true;
+		
+		return false;
+	}
+	
+	public JavaBean.Manager findById(int id) throws Exception{
+		String sql = "SELECT * FROM Manager WHERE id=?";
+		ResultSet rs = dbHelper.findById(sql, id);
+		if (rs.next()){
+			return this.BuildItem(rs);
+		}
+		else
+			return null;
+	}
+	
+	public List<JavaBean.Manager> findAll() throws Exception{
+		String sql = "SELECT * FROM Manager";
+		ResultSet rs = dbHelper.query(sql);
+		List<JavaBean.Manager> items = new ArrayList<JavaBean.Manager>();
+		while (rs.next()){
+			items.add(this.BuildItem(rs));
+		}
+		return items;
+	}
+	
+	public void remove(int id) throws Exception{
+		String sql = "DELETE FROM Manager WHERE id=?";
+		dbHelper.updatePrepareSQL(sql, id);
+	}
+	
+	private JavaBean.Manager BuildItem(ResultSet rs) throws SQLException{
+			JavaBean.Manager item = new JavaBean.Manager();
+			item.setId(rs.getInt(1));
+			item.setLoginName(rs.getString(2));
+			item.setPassword(rs.getString(3));
+			
+			return item;
+	}
+}
